@@ -253,7 +253,7 @@ function App() {
 
   const HostFiles = async (e) => {
     //create client
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+    const supabase = createClient(process.env.REACT_APP_SUPABASE_URL, process.env.REACT_APP_PUBLIC_SUPABASE_ANON_KEY);
     var file = document.getElementById("csv").files[0];
     if (file) {
       var reader = new FileReader();
