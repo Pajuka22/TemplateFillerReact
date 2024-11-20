@@ -76,18 +76,13 @@ function App() {
     }
     
     const allElements = document.getElementById("renderer").querySelectorAll('*');
-    // console.log(document.getElementById("renderer").innerHTML)
-    // console.log(allElements)
     textElements.length = 0;
-    // images.length = 0;
-    // links.length = 0;
 
     allElements.forEach(element => {
       // Check if the element has only text nodes (no nested HTML tags)
       const hasText = Array.from(element.childNodes).every(
         node => {
           if(node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== ''){
-            console.log(node.textContent)
             return true;
           }
           return false;
@@ -308,7 +303,6 @@ function App() {
     const editable = document.getElementById("renderer").querySelectorAll('[contentEditable]')
     textElements.forEach(lmnt => {
       lmnt.removeAttribute("contenteditable");
-      console.log(lmnt.contentEditable)
     })
     links.forEach(lmnt => {
       lmnt.ondblclick = null
@@ -323,7 +317,6 @@ function App() {
 
     window.URL = window.URL || window.webkitURL;
     SetUpEditor()
-    console.log(fileContent)
     return {"file": myFile, "filedata":fileContent};
 
   }
@@ -358,7 +351,6 @@ function App() {
     return (<Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} providers={['google', 'github']} />)
   }
   else{
-    console.log(session)
     return (
       <div className='App'>
         <div className="sidenav" id='sidebar'>
