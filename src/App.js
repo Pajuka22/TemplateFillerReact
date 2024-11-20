@@ -6,7 +6,10 @@ import Papa from 'papaparse'
 import JSZip from 'jszip';
 import Handlebars from 'handlebars';
 import { createClient } from '@supabase/supabase-js';
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
 
+const supabase = createClient(process.env.REACT_APP_SUPABASE_URL, process.env.REACT_APP_PUBLIC_SUPABASE_ANON_KEY);
 function App() {
   let links = [];
   let images = [];
@@ -20,7 +23,7 @@ function App() {
   let currentHighlight = null
 
   useEffect(() => {
-    SetUpEditor();
+    if(htmlContent !== "") SetUpEditor();
   }, [htmlContent])
 
   useEffect(() => {
@@ -253,7 +256,7 @@ function App() {
 
   const HostFiles = async (e) => {
     //create client
-    const supabase = createClient(process.env.REACT_APP_SUPABASE_URL, process.env.REACT_APP_PUBLIC_SUPABASE_ANON_KEY);
+    
     var file = document.getElementById("csv").files[0];
     if (file) {
       var reader = new FileReader();
@@ -335,25 +338,47 @@ function App() {
 
   }
 
-  return (
-    <div className='App'>
-      <div className="sidenav" id='sidebar'>
-        <label>HTML Upload<input type="file" onChange={LoadHTML}></input></label>
-        <label>CSV Upload<input type="file" id='csv'></input></label>
-        <button onClick={HostFiles}>Generate and Host</button>
-        <ParamList params={params} Rename={RenameParam} HighlightParam={HighlightParam}></ParamList>
-        <br />
-        <div id="downloads">
-          <button id="generate" onClick={DownloadHTMLTemplate}>Download HTML Template</button>
-          <a id="dlhtml" style={{ "display": "none" }}></a>
-          <button id="csvgen" onClick={DownloadCSVTemplate}>Download CSV Template</button>
-          <a id="dlcsv" style={{ "display": "none" }}></a>
-        </div>
-      </div>
-      <div id="renderer" className='main' dangerouslySetInnerHTML={{ __html: htmlContent }}></div>
+  const [session, setSession] = useState(null)
 
-    </div>
-  );
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  if (!session) {
+    return (<Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} providers={['google', 'github']} />)
+  }
+  else{
+    console.log(session)
+    return (
+      <div className='App'>
+        <div className="sidenav" id='sidebar'>
+          <label>HTML Upload<input type="file" onChange={LoadHTML}></input></label>
+          <label>CSV Upload<input type="file" id='csv'></input></label>
+          <button onClick={HostFiles}>Generate and Host</button>
+          <ParamList params={params} Rename={RenameParam} HighlightParam={HighlightParam}></ParamList>
+          <br />
+          <div id="downloads">
+            <button id="generate" onClick={DownloadHTMLTemplate}>Download HTML Template</button>
+            <a id="dlhtml" style={{ "display": "none" }}></a>
+            <button id="csvgen" onClick={DownloadCSVTemplate}>Download CSV Template</button>
+            <a id="dlcsv" style={{ "display": "none" }}></a>
+          </div>
+        </div>
+        <div id="renderer" className='main' dangerouslySetInnerHTML={{ __html: htmlContent }}></div>
+
+      </div>
+    );
+  }
 }
 
 export default App;
