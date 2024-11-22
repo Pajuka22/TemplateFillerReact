@@ -260,12 +260,15 @@ function App() {
         let fill = Papa.parse(evt.target.result, { header: true }).data
         var templateContent = MakeHTMLTemplate().filedata
         var zip = new JSZip();
-        fill.forEach(async obj => {
-          if (obj.saveas === "") return;
+        for(let i = 0; i < fill.length; ++i){
+          let obj = fill[i]
+          console.log(obj)
+          if (obj.saveas === "") continue;
           const template = Handlebars.compile(templateContent)
           const txt = template(obj)
+          console.log(txt)
           //upload file
-          const { data, error } = await supabase.storage
+          const { data, error } = supabase.storage
             .from(process.env.REACT_APP_BUCKET_NAME)
             //this is done so that if at a later point i want to upload images as well it can be done.
             .upload(`${obj.saveas}/index.html`, txt, {"upsert":true});
@@ -275,9 +278,18 @@ function App() {
           } else {
             console.log('File uploaded successfully:', data);
           }
-          
-        })
-        window.alert("done!")
+
+
+          obj.url = `https://host-from-supabase.vercel.app/${obj.saveas}`;
+        }
+        console.log("yo")
+        let fileContent = Papa.unparse(fill)
+        var myFile = new Blob([fileContent], { type: 'text/plain' });
+        window.URL = window.URL || window.webkitURL;
+        var dlBtn = document.getElementById("dllinks")
+        dlBtn.setAttribute("href", window.URL.createObjectURL(myFile));
+        dlBtn.setAttribute("download", "data_urls.csv");
+        dlBtn.click()
         SetUpEditor();
       }
     }
@@ -354,9 +366,10 @@ function App() {
     return (
       <div className='App'>
         <div className="sidenav" id='sidebar'>
-          <label>HTML Upload<input type="file" onChange={LoadHTML}></input></label>
-          <label>CSV Upload<input type="file" id='csv'></input></label>
+          <label>HTML Upload<input type="file" accept="text/html" onChange={LoadHTML}></input></label>
+          <label>CSV Upload<input type="file" accept="text/csv" id='csv'></input></label>
           <button onClick={HostFiles}>Generate and Host</button>
+          <a id="dllinks" style={{"display":"none"}}></a>
           <ParamList params={params} Rename={RenameParam} HighlightParam={HighlightParam}></ParamList>
           <br />
           <div id="downloads">
