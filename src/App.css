@@ -101,3 +101,36 @@
       bottom: 0;
       left: 0;
   }
+
+.paramEntry {
+  margin: 8px 0;
+  text-align: left;
+}
+
+.paramHeader {
+  display: flex;
+  gap: 8px;
+  padding: 4px 4px 4px 0;  /* Reduced left padding */
+  cursor: pointer;
+  justify-content: flex-start;
+  text-align: left;
+  width: 100%;
+}
+
+.triangleIcon {
+  display: inline-block;
+  width: 12px;
+  margin-left: 4px;    /* Small margin to prevent touching the edge */
+  transition: transform 0.2s ease;
+}
+
+.paramControls {
+    margin-left: 20px;
+    margin-top: 4px;
+}
+
+.paramControls button {
+    margin: 4px 0;
+    width: 100%;
+    padding: 4px 8px;
+}

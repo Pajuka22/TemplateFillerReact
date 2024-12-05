@@ -1,8 +1,12 @@
 import { useEffect } from "react";
 import ParamEntry from "./ParamEntry";
+import { RenameParam } from "../HelperFunctions/ParamsHandler";
 
 
-function ParamList({params, Rename, HighlightParam}){
+function ParamList({params, SetParams, HighlightParam}){
+    const Rename = (oldname, newname) => {
+        RenameParam(params, oldname, newname, SetParams)
+    }
     return (
         <div>
             {Object.keys(params).map((param, key)=>{
